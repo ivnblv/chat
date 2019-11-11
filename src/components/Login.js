@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { navigate } from "hookrouter/dist/router";
+import uuidv4 from "uuid/v4";
 
 const Login = () => {
   const [username, setUsername] = useState("");
 
   const ID = () => {
-    return `user_${Math.random().toString(36)}`;
+    return `user_${uuidv4().substring(0, 5)}`;
   };
 
   const enterChat = () => {
