@@ -11,11 +11,33 @@ const server = app.listen(PORT, () =>
 const io = socket(server);
 
 io.on("connection", socket => {
+  console.log(`Socket ${socket.id} connected`);
   socket.on("enterChat", data => {
-    users.push({ username: data.username, id: socket.id });
+    if (data.username) {
+      const user = { username: data.username, id: socket.id };
+      users.push(user);
+    }
+    console.log(users);
+    socket.broadcast.emit("updateStatus", {
+      message: `${data.username} has joined the chat`
+    });
+
     // io.to(`${socket.id}`).emit("updateChat", messages);
+  });
+  socket.on("typing", data => {
+    socket.broadcast.emit("updateStatus", {
+      message: `${data.username} is typing...`
+    });
   });
   socket.on("message", data => {
     socket.broadcast.emit("updateChat", data.data);
+  });
+  socket.on("disconnect", () => {
+    const leavingUser = users.find(user => user.id === socket.id);
+    socket.broadcast.emit("updateStatus", {
+      message: `${leavingUser.username} has left the chat`
+    });
+    users.splice(users.indexOf(leavingUser), 1);
+    console.log(users);
   });
 });

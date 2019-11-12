@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --config dev.config.js --open --hot"
+    "start": "nodemon ./src/server/server",
+    "dev": "webpack-dev-server --config dev.config.js --open --hot"
   },
   "keywords": [],
   "author": "",
