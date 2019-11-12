@@ -2,16 +2,20 @@ import React, { useState, useEffect } from "react";
 import { navigate } from "hookrouter/dist/router";
 const socket = require("socket.io-client")("http://localhost:3000");
 import StatusBar from "./StatusBar";
+import OnlineUsers from "./OnlineUsers";
 
 const GlobalChat = () => {
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
   const [messages, updateMessages] = useState([]);
   const [statusMessage, updateStatusMessage] = useState([]);
+  const [onlineUsers, updateOnlineUsers] = useState([]);
 
   useEffect(() => {
     setUsername(sessionStorage.getItem("username"));
-    socket.emit("enterChat", { username });
+    if (username) {
+      socket.emit("enterChat", { username });
+    }
   }, [username]);
 
   const exitChat = () => {
@@ -33,6 +37,9 @@ const GlobalChat = () => {
       updateStatusMessage("");
     }, 2000);
   });
+  socket.on("updateUsers", data => {
+    updateOnlineUsers(data.users);
+  });
 
   const type = e => {
     setMessage(e.target.value);
@@ -44,6 +51,7 @@ const GlobalChat = () => {
       <button onClick={exitChat}>Exit</button>
       <div className="global-chat">
         <div className="global-chat__chat-window">
+          <OnlineUsers users={onlineUsers.filter(user => user !== username)} />
           {messages.map(message => (
             <div className="global-chat__message">{message}</div>
           ))}

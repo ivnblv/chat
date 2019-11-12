@@ -10,16 +10,29 @@ const server = app.listen(PORT, () =>
 );
 const io = socket(server);
 
+const onlineList = users => {
+  if (users.length > 0) {
+    return users.map(user => user.username);
+  }
+};
+
 io.on("connection", socket => {
   console.log(`Socket ${socket.id} connected`);
   socket.on("enterChat", data => {
+    if (users.length > 0) {
+      io.to(`${socket.id}`).emit("updateUsers", {
+        users: onlineList(users)
+      });
+    }
     if (data.username) {
       const user = { username: data.username, id: socket.id };
       users.push(user);
     }
-    console.log(users);
     socket.broadcast.emit("updateStatus", {
       message: `${data.username} has joined the chat`
+    });
+    socket.broadcast.emit("updateUsers", {
+      users: onlineList(users)
     });
 
     // io.to(`${socket.id}`).emit("updateChat", messages);
@@ -34,10 +47,14 @@ io.on("connection", socket => {
   });
   socket.on("disconnect", () => {
     const leavingUser = users.find(user => user.id === socket.id);
-    socket.broadcast.emit("updateStatus", {
-      message: `${leavingUser.username} has left the chat`
-    });
+    if (users.length > 0 && leavingUser.username) {
+      socket.broadcast.emit("updateStatus", {
+        message: `${leavingUser.username} has left the chat`
+      });
+    }
     users.splice(users.indexOf(leavingUser), 1);
-    console.log(users);
+    socket.broadcast.emit("updateUsers", {
+      users: onlineList(users)
+    });
   });
 });
