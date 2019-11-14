@@ -1,0 +1,9 @@
+.private-chat {
+  width: 500px;
+  &__chat-window {
+    height: 200px;
+    background-color: #fff;
+    border: 1px solid yellow;
+    color: black;
+  }
+}

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { navigate } from "hookrouter/dist/router";
-const socket = require("socket.io-client")("http://localhost:3000");
-import StatusBar from "./StatusBar";
+import socket from "../socket";
 import OnlineUsers from "./OnlineUsers";
+import PrivateChat from "./PrivateChat";
+import Chat from "./views/Chat";
+import uuidv4 from "uuid/v4";
 
 const GlobalChat = () => {
   const [username, setUsername] = useState("");
@@ -10,15 +12,70 @@ const GlobalChat = () => {
   const [messages, updateMessages] = useState([]);
   const [statusMessage, updateStatusMessage] = useState([]);
   const [onlineUsers, updateOnlineUsers] = useState([]);
+  const [currentPrivateChat, setCurrentPrivateChat] = useState({});
+  const [privateHistory, updatePrivateHistory] = useState([]);
 
   useEffect(() => {
-    setUsername(sessionStorage.getItem("username"));
-    if (username) {
-      socket.emit("enterChat", { username });
+    const name = sessionStorage.getItem("username");
+    setUsername(name);
+    socket.emit("enterChat", { username: name });
+  }, []);
+
+  //chat update
+  const updateChat = data => {
+    console.log("updating chat", data);
+    updateMessages([...messages, data]);
+  };
+  //status update
+  const updateStatus = data => {
+    console.log("status update", data);
+    updateStatusMessage(data.message);
+    setTimeout(() => {
+      updateStatusMessage("");
+    }, 2000);
+  };
+  //users update
+  const updateUsers = data => {
+    console.log("updating users", data);
+    updateOnlineUsers(data.users.filter(user => user.id !== socket.id));
+  };
+  //receiving private messages
+  const receivePrivate = data => {
+    const { messages, id, username } = data;
+
+    // checking if user is already in the history array
+    const index = privateHistory.findIndex(x => x.username == username);
+    if (index === -1) {
+      updatePrivateHistory([...privateHistory, data]);
+    } else {
+      const newHistory = [...privateHistory];
+      newHistory[index].messages.push(...messages);
+      updatePrivateHistory(newHistory);
     }
-  }, [username]);
+  };
+  const test = () => {
+    console.log(privateHistory);
+  };
+
+  useEffect(() => {
+    socket.on("updateChat", updateChat);
+    socket.on("updateStatus", updateStatus);
+    socket.on("updateUsers", updateUsers);
+    socket.on("receivePrivateMessage", receivePrivate);
+
+    return () => {
+      socket.off("updateChat", updateChat);
+      socket.off("updateStatus", updateStatus);
+      socket.off("updateUsers", updateUsers);
+      socket.off("receivePrivateMessage", receivePrivate);
+    };
+  }, [messages, statusMessage, onlineUsers, privateHistory]);
 
   const exitChat = () => {
+    socket.emit("disconnect", {
+      username
+    });
+    // socket.disconnect();
     sessionStorage.removeItem("username");
     navigate("/");
   };
@@ -28,18 +85,11 @@ const GlobalChat = () => {
     updateMessages([...messages, data]);
     socket.emit("message", { data });
   };
-  socket.on("updateChat", data => {
-    updateMessages([...messages, data]);
-  });
-  socket.on("updateStatus", data => {
-    updateStatusMessage(data.message);
-    setTimeout(() => {
-      updateStatusMessage("");
-    }, 2000);
-  });
-  socket.on("updateUsers", data => {
-    updateOnlineUsers(data.users);
-  });
+
+  // private messaging
+  const startPrivateChat = user => {
+    setCurrentPrivateChat(user);
+  };
 
   const type = e => {
     setMessage(e.target.value);
@@ -48,28 +98,23 @@ const GlobalChat = () => {
 
   return (
     <div>
+      <button onClick={test}>test</button>
       <button onClick={exitChat}>Exit</button>
-      <div className="global-chat">
-        <div className="global-chat__chat-window">
-          <OnlineUsers users={onlineUsers.filter(user => user !== username)} />
-          {messages.map(message => (
-            <div className="global-chat__message">{message}</div>
-          ))}
-          <StatusBar message={statusMessage} />
-        </div>
-        <form className="global-chat__chat-input-field">
-          <input
-            className="global-chat__message-input"
-            type="text"
-            placeholder="Enter a message..."
-            value={message}
-            onChange={e => type(e)}
-          />
-          <button className="global-chat__send-btn" onClick={sendMessage}>
-            Send
-          </button>
-        </form>
-      </div>
+      <OnlineUsers users={onlineUsers} startPrivateChat={startPrivateChat} />
+      <Chat
+        username={username}
+        message={message}
+        messages={messages}
+        statusMessage={statusMessage}
+        type={type}
+        sendMessage={sendMessage}
+        onlineUsers={onlineUsers}
+      />
+      <PrivateChat
+        socket={socket}
+        username={username}
+        currentPrivateChat={currentPrivateChat}
+      />
     </div>
   );
 };
