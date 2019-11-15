@@ -12,36 +12,37 @@ const io = socket(server);
 
 io.on("connection", socket => {
   console.log(`Socket ${socket.id} connected`);
-  socket.on("enterChat", data => {
-    const user = { username: data.username, id: socket.id };
+  socket.on("enterChat", ({ username }) => {
+    const user = { username, id: socket.id };
     users.push(user);
     socket.broadcast.emit("updateStatus", {
-      message: `${data.username} has joined the chat`
+      message: `${username} has joined the chat`
     });
     io.emit("updateUsers", {
       users
     });
-    // io.to(`${socket.id}`).emit("upadteUsers", {
-    //   users
-    // });
-    // io.to(`${socket.id}`).emit("updateChat", messages);
   });
-  socket.on("typing", data => {
+  socket.on("typing", ({ username }) => {
     socket.broadcast.emit("updateStatus", {
-      message: `${data.username} is typing...`
+      message: `${username} is typing...`
     });
   });
-  socket.on("message", data => {
-    socket.broadcast.emit("updateChat", data.data);
+  socket.on("message", ({ data }) => {
+    socket.broadcast.emit("updateChat", data);
   });
 
   // private message
-  socket.on("sendPrivateMessage", data => {
+  socket.on("sendPrivateMessage", ({ to, message, username }) => {
     console.log("sending private");
-    io.to(`${data.to}`).emit("receivePrivateMessage", {
-      messages: [data.message],
+    io.to(`${to}`).emit("receivePrivateMessage", {
+      messages: [message],
       id: socket.id,
-      username: data.username
+      username
+    });
+    io.to(`${socket.id}`).emit("receivePrivateMessage", {
+      messages: [message],
+      id: to,
+      username
     });
   });
 

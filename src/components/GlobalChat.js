@@ -4,7 +4,6 @@ import socket from "../socket";
 import OnlineUsers from "./OnlineUsers";
 import PrivateChat from "./PrivateChat";
 import Chat from "./views/Chat";
-import uuidv4 from "uuid/v4";
 
 const GlobalChat = () => {
   const [username, setUsername] = useState("");
@@ -44,17 +43,17 @@ const GlobalChat = () => {
     const { messages, id, username } = data;
 
     // checking if user is already in the history array
-    const index = privateHistory.findIndex(x => x.username == username);
+    const index = privateHistory.findIndex(x => x.id == id);
     if (index === -1) {
       updatePrivateHistory([...privateHistory, data]);
     } else {
       const newHistory = [...privateHistory];
+      if (newHistory[index].messages.length === 40) {
+        newHistory[index].messages.shift();
+      }
       newHistory[index].messages.push(...messages);
       updatePrivateHistory(newHistory);
     }
-  };
-  const test = () => {
-    console.log(privateHistory);
   };
 
   useEffect(() => {
@@ -75,7 +74,6 @@ const GlobalChat = () => {
     socket.emit("disconnect", {
       username
     });
-    // socket.disconnect();
     sessionStorage.removeItem("username");
     navigate("/");
   };
@@ -98,7 +96,6 @@ const GlobalChat = () => {
 
   return (
     <div>
-      <button onClick={test}>test</button>
       <button onClick={exitChat}>Exit</button>
       <OnlineUsers users={onlineUsers} startPrivateChat={startPrivateChat} />
       <Chat
@@ -110,11 +107,17 @@ const GlobalChat = () => {
         sendMessage={sendMessage}
         onlineUsers={onlineUsers}
       />
-      <PrivateChat
-        socket={socket}
-        username={username}
-        currentPrivateChat={currentPrivateChat}
-      />
+      {currentPrivateChat.id ? (
+        <PrivateChat
+          socket={socket}
+          username={username}
+          currentPrivateChat={currentPrivateChat}
+          history={privateHistory.find(
+            history => history.id === currentPrivateChat.id
+          )}
+          updatePrivateHistory={updatePrivateHistory}
+        />
+      ) : null}
     </div>
   );
 };

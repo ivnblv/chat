@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const PrivateChat = ({ socket, username, currentPrivateChat }) => {
+const PrivateChat = ({ socket, username, currentPrivateChat, history }) => {
   const [message, setMessage] = useState("");
 
   const sendMessage = e => {
@@ -15,7 +15,9 @@ const PrivateChat = ({ socket, username, currentPrivateChat }) => {
   return (
     <div className="private-chat">
       <div className="private-chat__title">{currentPrivateChat.username}</div>
-      <div className="private-chat__chat-window" />
+      <div className="private-chat__chat-window">
+        {history ? history.messages.map(message => <div>{message}</div>) : null}
+      </div>
       <form className="private-chat__input-field">
         <input
           placeholder="Enter a message"
