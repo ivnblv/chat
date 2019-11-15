@@ -1,16 +1,7 @@
 import React from "react";
-import StatusBar from "../StatusBar";
-// import OnlineUsers from "../OnlineUsers";
+import StatusBar from "../StatusBar/StatusBar";
 
-const Chat = ({
-  username,
-  message,
-  type,
-  messages,
-  statusMessage,
-  onlineUsers,
-  sendMessage
-}) => {
+const Chat = ({ message, type, messages, statusMessage, sendMessage }) => {
   return (
     <div>
       <div className="global-chat">

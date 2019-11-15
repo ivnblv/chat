@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { navigate } from "hookrouter/dist/router";
-import socket from "../socket";
-import OnlineUsers from "./OnlineUsers";
-import PrivateChat from "./PrivateChat";
-import Chat from "./views/Chat";
+import socket from "../../socket";
+import OnlineUsers from "../OnlineUsers/OnlineUsers";
+import PrivateChat from "../PrivateChat/PrivateChat";
+import Chat from "../Chat/Chat";
 
 const GlobalChat = () => {
   const [username, setUsername] = useState("");

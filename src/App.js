@@ -1,7 +1,7 @@
 import React from "react";
-import Login from "./components/Login";
+import Login from "./components/Login/Login";
 import { useRoutes } from "hookrouter";
-import GlobalChat from "./components/GlobalChat";
+import GlobalChat from "./components/GlobalChat/GlobalChat";
 
 const routes = {
   "/": () => <Login />,

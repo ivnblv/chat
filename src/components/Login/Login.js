@@ -23,15 +23,20 @@ const Login = () => {
 
   return (
     <div className="login">
-      <label htmlFor="name">Enter username</label>
-      <input
-        value={username}
-        onChange={e => setUsername(e.target.value)}
-        type="text"
-        name="name"
-        placeholder="Enter name"
-      />
-      <button onClick={enterChat}>Enter</button>
+      <form className="login__form">
+        <h2 className="login__title">Join</h2>
+        <input
+          className="login__username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          type="text"
+          name="name"
+          placeholder="Enter username..."
+        />
+        <button className="login__enter-btn" onClick={enterChat}>
+          Enter
+        </button>
+      </form>
     </div>
   );
 };

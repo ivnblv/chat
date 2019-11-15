@@ -1,12 +1,7 @@
-@import "./partials/globalChat";
-@import "./partials/statusBar";
-@import "./partials/privateChat";
-body {
-  background-color: #333;
-  min-height: 100vh;
-  width: 100vw;
-}
-#app {
-  width: 100vw;
-  height: 100vh;
-}
+@import "./variables";
+@import "./mixins";
+@import "./base";
+@import "../components/Login/login";
+@import "../components/Chat/chat";
+@import "../components/StatusBar/statusBar";
+@import "../components/PrivateChat/privateChat";
