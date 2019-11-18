@@ -4,12 +4,12 @@
   -ms-border-radius: $radius;
   -o-border-radius: $radius;
 }
-@mixin transition($duration) {
-  transition: $duration;
-  -webkit-transition: $duration;
-  -moz-transition: $duration;
-  -ms-transition: $duration;
-  -o-transition: $duration;
+@mixin transition($name, $duration) {
+  transition: $name $duration;
+  -webkit-transition: $name $duration;
+  -moz-transition: $name $duration;
+  -ms-transition: $name $duration;
+  -o-transition: $name $duration;
 }
 @mixin animation($properties) {
   animation: $properties;

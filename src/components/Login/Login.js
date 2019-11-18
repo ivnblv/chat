@@ -33,7 +33,7 @@ const Login = () => {
           name="name"
           placeholder="Enter username..."
         />
-        <button className="login__enter-btn" onClick={enterChat}>
+        <button className="btn btn--large" onClick={enterChat}>
           Enter
         </button>
       </form>

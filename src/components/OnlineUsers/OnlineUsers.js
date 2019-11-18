@@ -5,7 +5,7 @@ const OnlineUsers = ({ users, startPrivateChat }) => {
     <div className="online-users">
       <ul className="online-users__list">
         {users.map(user => (
-          <li className="online-users__item">
+          <li className="online-users__list-item">
             <div
               onClick={() => startPrivateChat(user)}
               className="online-users__user"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { navigate } from "hookrouter/dist/router";
 import socket from "../../socket";
+import ChatHeader from "../ChatHeader/ChatHeader";
 import OnlineUsers from "../OnlineUsers/OnlineUsers";
 import PrivateChat from "../PrivateChat/PrivateChat";
 import Chat from "../Chat/Chat";
@@ -24,6 +25,9 @@ const GlobalChat = () => {
   const updateChat = data => {
     console.log("updating chat", data);
     updateMessages([...messages, data]);
+    document
+      .getElementById("messages")
+      .lastChild.scrollIntoView(false, "smooth");
   };
   //status update
   const updateStatus = data => {
@@ -31,7 +35,7 @@ const GlobalChat = () => {
     updateStatusMessage(data.message);
     setTimeout(() => {
       updateStatusMessage("");
-    }, 2000);
+    }, 2500);
   };
   //users update
   const updateUsers = data => {
@@ -41,7 +45,7 @@ const GlobalChat = () => {
   //receiving private messages
   const receivePrivate = data => {
     const { messages, id, username } = data;
-
+    console.log(data);
     // checking if user is already in the history array
     const index = privateHistory.findIndex(x => x.id == id);
     if (index === -1) {
@@ -80,13 +84,15 @@ const GlobalChat = () => {
   const sendMessage = e => {
     e.preventDefault();
     const data = `${username}: ${message}`;
-    updateMessages([...messages, data]);
-    socket.emit("message", { data });
+    socket.emit("message", { username, message });
   };
 
   // private messaging
   const startPrivateChat = user => {
     setCurrentPrivateChat(user);
+  };
+  const closePrivateChat = () => {
+    setCurrentPrivateChat({});
   };
 
   const type = e => {
@@ -95,9 +101,8 @@ const GlobalChat = () => {
   };
 
   return (
-    <div>
-      <button onClick={exitChat}>Exit</button>
-      <OnlineUsers users={onlineUsers} startPrivateChat={startPrivateChat} />
+    <div className="main">
+      <ChatHeader username={username} />
       <Chat
         username={username}
         message={message}
@@ -106,12 +111,15 @@ const GlobalChat = () => {
         type={type}
         sendMessage={sendMessage}
         onlineUsers={onlineUsers}
+        startPrivateChat={startPrivateChat}
       />
+      <OnlineUsers users={onlineUsers} startPrivateChat={startPrivateChat} />
       {currentPrivateChat.id ? (
         <PrivateChat
           socket={socket}
           username={username}
           currentPrivateChat={currentPrivateChat}
+          closePrivateChat={closePrivateChat}
           history={privateHistory.find(
             history => history.id === currentPrivateChat.id
           )}

@@ -1,0 +1,23 @@
+.chat-header {
+  grid-column: 1/5;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background-color: $color-highlight;
+  color: $color-light;
+  padding: 0.25rem 1rem;
+  &__logo {
+    font-family: $font-title;
+  }
+  &__username {
+    font-size: 1rem;
+    margin-left: auto;
+  }
+  &__exit-btn {
+    padding: 0.2rem 2rem;
+    font-size: 1.1rem;
+    margin-left: 2rem;
+    font-family: $font-title;
+    background-color: $color-highlight;
+  }
+}

@@ -27,20 +27,21 @@ io.on("connection", socket => {
       message: `${username} is typing...`
     });
   });
-  socket.on("message", ({ data }) => {
-    socket.broadcast.emit("updateChat", data);
+  socket.on("message", data => {
+    io.emit("updateChat", data);
   });
 
   // private message
   socket.on("sendPrivateMessage", ({ to, message, username }) => {
     console.log("sending private");
     io.to(`${to}`).emit("receivePrivateMessage", {
-      messages: [message],
+      messages: [{ username, message }],
       id: socket.id,
       username
     });
     io.to(`${socket.id}`).emit("receivePrivateMessage", {
-      messages: [message],
+      messages: [{ username, message }],
+      // to do: unread messages tracking
       id: to,
       username
     });
@@ -60,14 +61,16 @@ io.on("connection", socket => {
   socket.on("disconnect", () => {
     console.log(`socket ${socket.id} disconnected`);
     const leavingUser = users.find(user => user.id === socket.id);
-    if (users.length > 0 && leavingUser.username) {
+    // if (users.length > 0 && leavingUser.username) {
+    if (leavingUser) {
       socket.broadcast.emit("updateStatus", {
         message: `${leavingUser.username} has left the chat`
       });
+      // }
+      users.splice(users.indexOf(leavingUser), 1);
+      socket.broadcast.emit("updateUsers", {
+        users
+      });
     }
-    users.splice(users.indexOf(leavingUser), 1);
-    socket.broadcast.emit("updateUsers", {
-      users
-    });
   });
 });

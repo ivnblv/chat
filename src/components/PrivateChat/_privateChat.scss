@@ -1,9 +1,64 @@
 .private-chat {
-  width: 500px;
-  &__chat-window {
-    height: 200px;
-    background-color: #fff;
-    border: 1px solid yellow;
-    color: black;
+  grid-column: 3/4;
+  grid-row: 3/4;
+  height: 60vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    background-color: $color-highlight;
+    padding: 0.5rem 0.5rem;
+    color: $color-light;
+    font-size: 1.05rem;
+    font-family: $font-title;
+  }
+  &__username {
+    display: block;
+    padding-top: 0.3rem;
+    font-size: 0.9rem;
+    &--right {
+      text-align: right;
+    }
+    &--left {
+      text-align: left;
+    }
+  }
+  &__scroll {
+    & > div:first-of-type {
+      overflow-x: hidden !important;
+    }
+  }
+  &__messages {
+    padding-right: 0.5rem;
+    height: 90%;
+  }
+  &__message {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    &--left {
+      margin-right: auto;
+    }
+    &--right {
+      align-self: end;
+      margin-left: auto;
+    }
+  }
+  &__message-text {
+    display: inline-block;
+    padding: 0.4rem 1.5rem;
+    max-width: 60%;
+    background-color: $color-secondary;
+    &--left {
+      @include border-radius(0 15px 15px 25px);
+      margin-right: auto;
+    }
+    &--right {
+      @include border-radius(15px 25px 0 15px);
+      margin-left: auto;
+    }
   }
 }

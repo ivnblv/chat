@@ -1,0 +1,49 @@
+.main {
+  display: grid;
+  grid-template-columns: 1fr 4fr 4fr 1fr;
+  grid-template-rows: 0.1fr 3fr 3fr;
+  height: 100%;
+  width: 100%;
+}
+.input-field {
+  width: 100%;
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+
+  &__message-input {
+    padding: 0.5rem;
+    width: 90%;
+    border: none;
+    border-top: 2px solid $color-secondary;
+    font-size: 1rem;
+  }
+}
+
+.btn {
+  font-family: $font-title;
+  border: none;
+  background-color: $color-highlight;
+  color: $color-light;
+  background-size: 200% 200%;
+  &:hover {
+  }
+  &--large {
+    padding: 0.6rem 4rem;
+    font-size: 1.2rem;
+  }
+  &--medium {
+    padding: 0.3rem 2rem;
+    font-size: 1.2rem;
+  }
+  &--small {
+    padding: 0.2rem 1.5rem;
+    font-size: 1.1rem;
+  }
+}
+
+.thumb-vertical {
+  background-color: $color-highlight;
+  @include border-radius(15px);
+  cursor: pointer;
+}

@@ -1,6 +1,6 @@
 .login {
   height: 100vh;
-  background: linear-gradient(169deg, $color-secondary 21%, $color-main 97%);
+  background: linear-gradient(169deg, $color-highlight 21%, $color-main 97%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -21,35 +21,11 @@
   }
   &__username {
     width: 70%;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     margin-top: 1rem;
     margin-bottom: 2rem;
-    font-size: 1rem;
-    border-color: $color-main;
-    @include border-radius(5px);
-  }
-  &__enter-btn {
-    font-family: $font-title;
-    padding: 0.6rem 4rem;
     font-size: 1.2rem;
-    border: none;
-    background: linear-gradient(139deg, $color-main, $color-highlight);
-    color: $color-text;
+    border-color: $color-highlight;
     @include border-radius(5px);
-    background-size: 200% 200%;
-    &:hover {
-      @include animation(colorChange 3s ease infinite);
-    }
-  }
-}
-@include keyframes(colorChange) {
-  0% {
-    background-position: 0% 53%;
-  }
-  50% {
-    background-position: 100% 48%;
-  }
-  100% {
-    background-position: 0% 53%;
   }
 }
