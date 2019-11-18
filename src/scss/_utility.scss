@@ -41,6 +41,42 @@
     font-size: 1.1rem;
   }
 }
+.exit-btn {
+  width: 2rem;
+  margin-left: 2rem;
+  background-color: $color-highlight;
+  border: none;
+  height: 100%;
+  &__img {
+    color: $color-light;
+    height: 70%;
+    display: block;
+    @include transition(color, 0.3s);
+    &:hover {
+      color: red;
+    }
+  }
+}
+.close-btn {
+  width: 2rem;
+  background-color: $color-highlight;
+  height: 100%;
+  border: none;
+  padding: 0 0.5rem;
+  &__img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    color: $color-light;
+    @include transition(color, 0.3s);
+    &:hover {
+      color: red;
+    }
+  }
+}
+.fa-sign-out-alt {
+  fill: #fff;
+}
 
 .thumb-vertical {
   background-color: $color-highlight;

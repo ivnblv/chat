@@ -14,6 +14,7 @@ const GlobalChat = () => {
   const [onlineUsers, updateOnlineUsers] = useState([]);
   const [currentPrivateChat, setCurrentPrivateChat] = useState({});
   const [privateHistory, updatePrivateHistory] = useState([]);
+  const [unreadMessages, updateUnreadMessages] = useState([]);
 
   useEffect(() => {
     const name = sessionStorage.getItem("username");
@@ -29,7 +30,7 @@ const GlobalChat = () => {
       .getElementById("messages")
       .lastChild.scrollIntoView(false, "smooth");
   };
-  //status update
+  //status message update
   const updateStatus = data => {
     console.log("status update", data);
     updateStatusMessage(data.message);
@@ -43,13 +44,19 @@ const GlobalChat = () => {
     updateOnlineUsers(data.users.filter(user => user.id !== socket.id));
   };
   //receiving private messages
-  const receivePrivate = data => {
-    const { messages, id, username } = data;
-    console.log(data);
+  const receivePrivate = ({ id, username, messages, updateUnread }) => {
+    // adding user to unread array if conditions are matched
+    if (
+      currentPrivateChat.id !== id &&
+      updateUnread &&
+      !unreadMessages.includes(id)
+    ) {
+      updateUnreadMessages([...unreadMessages, id]);
+    }
     // checking if user is already in the history array
     const index = privateHistory.findIndex(x => x.id == id);
     if (index === -1) {
-      updatePrivateHistory([...privateHistory, data]);
+      updatePrivateHistory([...privateHistory, { id, username, messages }]);
     } else {
       const newHistory = [...privateHistory];
       if (newHistory[index].messages.length === 40) {
@@ -57,6 +64,15 @@ const GlobalChat = () => {
       }
       newHistory[index].messages.push(...messages);
       updatePrivateHistory(newHistory);
+    }
+  };
+
+  const setRead = id => {
+    const index = unreadMessages.indexOf(id);
+    if (index !== -1) {
+      const newUnreadMessages = [...unreadMessages];
+      newUnreadMessages.splice(index, 1);
+      updateUnreadMessages(newUnreadMessages);
     }
   };
 
@@ -75,7 +91,7 @@ const GlobalChat = () => {
   }, [messages, statusMessage, onlineUsers, privateHistory]);
 
   const exitChat = () => {
-    socket.emit("disconnect", {
+    socket.emit("leaveChat", {
       username
     });
     sessionStorage.removeItem("username");
@@ -83,7 +99,6 @@ const GlobalChat = () => {
   };
   const sendMessage = e => {
     e.preventDefault();
-    const data = `${username}: ${message}`;
     socket.emit("message", { username, message });
   };
 
@@ -94,7 +109,6 @@ const GlobalChat = () => {
   const closePrivateChat = () => {
     setCurrentPrivateChat({});
   };
-
   const type = e => {
     setMessage(e.target.value);
     socket.emit("typing", { username });
@@ -102,7 +116,7 @@ const GlobalChat = () => {
 
   return (
     <div className="main">
-      <ChatHeader username={username} />
+      <ChatHeader username={username} exitChat={exitChat} />
       <Chat
         username={username}
         message={message}
@@ -124,6 +138,7 @@ const GlobalChat = () => {
             history => history.id === currentPrivateChat.id
           )}
           updatePrivateHistory={updatePrivateHistory}
+          setRead={setRead}
         />
       ) : null}
     </div>

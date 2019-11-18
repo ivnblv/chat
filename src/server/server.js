@@ -21,6 +21,7 @@ io.on("connection", socket => {
     io.emit("updateUsers", {
       users
     });
+    console.log(users);
   });
   socket.on("typing", ({ username }) => {
     socket.broadcast.emit("updateStatus", {
@@ -37,21 +38,22 @@ io.on("connection", socket => {
     io.to(`${to}`).emit("receivePrivateMessage", {
       messages: [{ username, message }],
       id: socket.id,
-      username
+      username,
+      updateUnread: true
     });
     io.to(`${socket.id}`).emit("receivePrivateMessage", {
       messages: [{ username, message }],
-      // to do: unread messages tracking
       id: to,
-      username
+      username,
+      updateUnread: false
     });
   });
 
   socket.on("leaveChat", () => {
     const leavingUser = users.find(user => user.id === socket.id);
-    // socket.broadcast.emit("updateStatus", {
-    //   message: `${leavingUser.username} has left the chat`
-    // });
+    socket.broadcast.emit("updateStatus", {
+      message: `${leavingUser.username} has left the chat`
+    });
     users.splice(users.indexOf(leavingUser), 1);
     socket.broadcast.emit("updateUsers", {
       users
