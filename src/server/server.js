@@ -65,9 +65,9 @@ io.on("connection", socket => {
     const leavingUser = users.find(user => user.id === socket.id);
     // if (users.length > 0 && leavingUser.username) {
     if (leavingUser) {
-      socket.broadcast.emit("updateStatus", {
-        message: `${leavingUser.username} has left the chat`
-      });
+      // socket.broadcast.emit("updateStatus", {
+      //   message: `${leavingUser.username} has left the chat`
+      // });
       // }
       users.splice(users.indexOf(leavingUser), 1);
       socket.broadcast.emit("updateUsers", {

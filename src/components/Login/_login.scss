@@ -1,6 +1,7 @@
 .login {
   height: 100vh;
-  background: linear-gradient(169deg, $color-highlight 21%, $color-main 97%);
+  // background: linear-gradient(169deg, $color-highlight 21%, $color-main 97%);
+  background: $color-highlight;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,6 +15,15 @@
     padding: 1rem;
     padding-bottom: 2rem;
     @include border-radius(5px);
+    @media (max-width: $large) {
+      width: 40%;
+    }
+    @media (max-width: $medium) {
+      width: 50%;
+    }
+    @media (max-width: $small) {
+      width: 90%;
+    }
   }
   &__title {
     font-family: $font-title;
@@ -27,5 +37,14 @@
     font-size: 1.2rem;
     border-color: $color-highlight;
     @include border-radius(5px);
+    @media (max-width: $medium) {
+      margin-top: 2rem;
+      margin-bottom: 3rem;
+      // padding: 0.75rem 1rem;
+      font-size: 1rem;
+    }
+    @media (max-width: $small) {
+      width: 80%;
+    }
   }
 }

@@ -2,15 +2,7 @@ import React from "react";
 import StatusBar from "../StatusBar/StatusBar";
 import { Scrollbars } from "react-custom-scrollbars";
 
-const Chat = ({
-  username,
-  message,
-  type,
-  messages,
-  statusMessage,
-  sendMessage,
-  startPrivateChat
-}) => {
+const Chat = ({ message, type, messages, statusMessage, sendMessage }) => {
   return (
     <div className="chat">
       <Scrollbars
@@ -20,7 +12,7 @@ const Chat = ({
       >
         <div id="messages" className="chat__messages">
           {messages.map(message => (
-            <div className="chat__message">
+            <div key={`messagge${message.username}`} className="chat__message">
               <span className="chat__username">{message.username}:</span>
               {message.message}
             </div>

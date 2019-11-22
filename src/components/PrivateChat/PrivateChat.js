@@ -6,17 +6,19 @@ const PrivateChat = ({
   username,
   currentPrivateChat,
   closePrivateChat,
-  history,
-  setRead
+  history
 }) => {
   const [message, setMessage] = useState("");
   const sendMessage = e => {
     e.preventDefault();
-    socket.emit("sendPrivateMessage", {
-      to: currentPrivateChat.id,
-      username: username,
-      message
-    });
+    if (message.length > 0) {
+      socket.emit("sendPrivateMessage", {
+        to: currentPrivateChat.id,
+        username: username,
+        message
+      });
+      setMessage("");
+    }
   };
 
   useEffect(() => {
@@ -25,10 +27,6 @@ const PrivateChat = ({
       messages.lastChild.scrollIntoView();
     }
   });
-  // removing current chat from unread array
-  useEffect(() => {
-    setRead(currentPrivateChat.id);
-  }, [currentPrivateChat]);
 
   return (
     <div className="private-chat">
@@ -40,7 +38,7 @@ const PrivateChat = ({
             focusable="false"
             data-prefix="fas"
             data-icon="times"
-            class="close-btn__img"
+            className="close-btn__img"
             role="img"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 352 512"
@@ -60,8 +58,9 @@ const PrivateChat = ({
       >
         <div id="private-messages" className="private-chat__messages">
           {history
-            ? history.messages.map(message => (
+            ? history.messages.map((message, i) => (
                 <div
+                  key={`message${i}`}
                   className={`private-chat__message ${
                     message.username === username
                       ? "private-chat__message--right"

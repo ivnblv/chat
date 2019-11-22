@@ -1,10 +1,11 @@
 .chat-header {
-  grid-column: 1/5;
+  grid-column: 1/4;
   width: 100%;
   display: flex;
   align-items: center;
   background-color: $color-highlight;
   color: $color-light;
+  z-index: 3;
   padding: 0.25rem 1rem;
   &__logo {
     font-family: $font-title;
@@ -12,5 +13,11 @@
   &__username {
     font-size: 1rem;
     margin-left: auto;
+  }
+  &__online-users-btn {
+    display: none;
+    @media (max-width: $medium) {
+      display: block;
+    }
   }
 }

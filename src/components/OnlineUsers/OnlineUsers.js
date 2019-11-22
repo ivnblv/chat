@@ -1,14 +1,27 @@
 import React from "react";
 
-const OnlineUsers = ({ users, startPrivateChat }) => {
+const OnlineUsers = ({
+  users,
+  startPrivateChat,
+  unreadMessages,
+  displayUsers
+}) => {
+  const displayUnread = userId => {
+    return unreadMessages.includes(userId) ? true : false;
+  };
+
   return (
-    <div className="online-users">
+    <div
+      className={`online-users ${!displayUsers ? "online-users--hidden" : ""}`}
+    >
       <ul className="online-users__list">
         {users.map(user => (
-          <li className="online-users__list-item">
+          <li key={`onlineUser${user.id}`} className="online-users__list-item">
             <div
-              onClick={() => startPrivateChat(user)}
-              className="online-users__user"
+              onClick={e => startPrivateChat(e, user)}
+              className={`online-users__user ${
+                displayUnread(user.id) ? "online-users__user--highlighted" : ""
+              }`}
             >
               {user.username}
             </div>

@@ -12,6 +12,7 @@ const GlobalChat = () => {
   const [messages, updateMessages] = useState([]);
   const [statusMessage, updateStatusMessage] = useState([]);
   const [onlineUsers, updateOnlineUsers] = useState([]);
+  const [displayUsers, setDisplayUsers] = useState(false);
   const [currentPrivateChat, setCurrentPrivateChat] = useState({});
   const [privateHistory, updatePrivateHistory] = useState([]);
   const [unreadMessages, updateUnreadMessages] = useState([]);
@@ -22,9 +23,17 @@ const GlobalChat = () => {
     socket.emit("enterChat", { username: name });
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateStatusMessage("");
+    }, 2000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [statusMessage]);
+
   //chat update
   const updateChat = data => {
-    console.log("updating chat", data);
     updateMessages([...messages, data]);
     document
       .getElementById("messages")
@@ -32,28 +41,25 @@ const GlobalChat = () => {
   };
   //status message update
   const updateStatus = data => {
-    console.log("status update", data);
     updateStatusMessage(data.message);
-    setTimeout(() => {
-      updateStatusMessage("");
-    }, 2500);
   };
   //users update
   const updateUsers = data => {
-    console.log("updating users", data);
     updateOnlineUsers(data.users.filter(user => user.id !== socket.id));
   };
   //receiving private messages
   const receivePrivate = ({ id, username, messages, updateUnread }) => {
     // adding user to unread array if conditions are matched
     if (
-      currentPrivateChat.id !== id &&
       updateUnread &&
+      currentPrivateChat.id != id &&
       !unreadMessages.includes(id)
     ) {
-      updateUnreadMessages([...unreadMessages, id]);
+      const newMessages = [...unreadMessages];
+      newMessages.push(id);
+      updateUnreadMessages(newMessages);
     }
-    // checking if user is already in the history array
+    // checking if user is already in the history array and updating history array accordingly
     const index = privateHistory.findIndex(x => x.id == id);
     if (index === -1) {
       updatePrivateHistory([...privateHistory, { id, username, messages }]);
@@ -66,7 +72,6 @@ const GlobalChat = () => {
       updatePrivateHistory(newHistory);
     }
   };
-
   const setRead = id => {
     const index = unreadMessages.indexOf(id);
     if (index !== -1) {
@@ -75,20 +80,31 @@ const GlobalChat = () => {
       updateUnreadMessages(newUnreadMessages);
     }
   };
-
   useEffect(() => {
     socket.on("updateChat", updateChat);
     socket.on("updateStatus", updateStatus);
     socket.on("updateUsers", updateUsers);
     socket.on("receivePrivateMessage", receivePrivate);
-
     return () => {
       socket.off("updateChat", updateChat);
       socket.off("updateStatus", updateStatus);
       socket.off("updateUsers", updateUsers);
       socket.off("receivePrivateMessage", receivePrivate);
     };
-  }, [messages, statusMessage, onlineUsers, privateHistory]);
+  }, [
+    messages,
+    statusMessage,
+    onlineUsers,
+    privateHistory,
+    currentPrivateChat
+  ]);
+
+  useEffect(() => {
+    if (currentPrivateChat.id) {
+      setRead(currentPrivateChat.id);
+      setDisplayUsers(false);
+    }
+  }, [currentPrivateChat]);
 
   const exitChat = () => {
     socket.emit("leaveChat", {
@@ -99,24 +115,35 @@ const GlobalChat = () => {
   };
   const sendMessage = e => {
     e.preventDefault();
-    socket.emit("message", { username, message });
+    if (message.length > 0) {
+      socket.emit("message", { username, message });
+      setMessage("");
+    }
   };
-
   // private messaging
-  const startPrivateChat = user => {
+  const startPrivateChat = (e, user) => {
+    e.preventDefault();
     setCurrentPrivateChat(user);
   };
-  const closePrivateChat = () => {
+  const closePrivateChat = e => {
+    e.preventDefault();
     setCurrentPrivateChat({});
   };
   const type = e => {
     setMessage(e.target.value);
     socket.emit("typing", { username });
   };
+  const setUserListDisplay = () => {
+    setDisplayUsers(!displayUsers);
+  };
 
   return (
     <div className="main">
-      <ChatHeader username={username} exitChat={exitChat} />
+      <ChatHeader
+        username={username}
+        exitChat={exitChat}
+        setUserListDisplay={setUserListDisplay}
+      />
       <Chat
         username={username}
         message={message}
@@ -127,7 +154,12 @@ const GlobalChat = () => {
         onlineUsers={onlineUsers}
         startPrivateChat={startPrivateChat}
       />
-      <OnlineUsers users={onlineUsers} startPrivateChat={startPrivateChat} />
+      <OnlineUsers
+        users={onlineUsers}
+        startPrivateChat={startPrivateChat}
+        unreadMessages={unreadMessages}
+        displayUsers={displayUsers}
+      />
       {currentPrivateChat.id ? (
         <PrivateChat
           socket={socket}

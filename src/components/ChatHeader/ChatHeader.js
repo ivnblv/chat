@@ -1,17 +1,23 @@
 import React from "react";
 
-const ChatHeader = ({ username, exitChat }) => {
+const ChatHeader = ({ username, exitChat, setUserListDisplay }) => {
   return (
     <div className="chat-header">
       <h2 className="chat-header__logo">Chat</h2>
       <h3 className="chat-header__username">{username}</h3>
+      <button
+        className="chat-header__online-users-btn"
+        onClick={setUserListDisplay}
+      >
+        Users
+      </button>
       <button className="exit-btn" onClick={exitChat}>
         <svg
           aria-hidden="true"
           focusable="false"
           data-prefix="fas"
           data-icon="sign-out-alt"
-          class="exit-btn__img"
+          className="exit-btn__img"
           role="img"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
