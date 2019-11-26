@@ -1,17 +1,24 @@
 const express = require("express");
 const socket = require("socket.io");
-const users = require("./Users");
+const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
+
+// app.use(express.static("client/dist"));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
+// });
 
 const server = app.listen(PORT, () =>
   console.log(`Server running on port ${PORT}`)
 );
 const io = socket(server);
 
+const users = [];
+const messages = [];
+
 io.on("connection", socket => {
-  console.log(`Socket ${socket.id} connected`);
   socket.on("enterChat", ({ username }) => {
     const user = { username, id: socket.id };
     users.push(user);
@@ -21,7 +28,7 @@ io.on("connection", socket => {
     io.emit("updateUsers", {
       users
     });
-    console.log(users);
+    io.to(`${socket.id}`).emit("updateChat", messages);
   });
   socket.on("typing", ({ username }) => {
     socket.broadcast.emit("updateStatus", {
@@ -29,12 +36,16 @@ io.on("connection", socket => {
     });
   });
   socket.on("message", data => {
-    io.emit("updateChat", data);
+    if (messages.length < 50) {
+      messages.push(data);
+    } else {
+      messages.shift();
+      messages.push(data);
+    }
+    io.emit("updateChat", messages);
   });
 
-  // private message
   socket.on("sendPrivateMessage", ({ to, message, username }) => {
-    console.log("sending private");
     io.to(`${to}`).emit("receivePrivateMessage", {
       messages: [{ username, message }],
       id: socket.id,
@@ -51,24 +62,27 @@ io.on("connection", socket => {
 
   socket.on("leaveChat", () => {
     const leavingUser = users.find(user => user.id === socket.id);
-    socket.broadcast.emit("updateStatus", {
-      message: `${leavingUser.username} has left the chat`
-    });
-    users.splice(users.indexOf(leavingUser), 1);
-    socket.broadcast.emit("updateUsers", {
-      users
-    });
+    if (leavingUser !== undefined) {
+      if (leavingUser.username !== undefined) {
+        socket.broadcast.emit("updateStatus", {
+          message: `${leavingUser.username} has left the chat`
+        });
+      }
+      users.splice(users.indexOf(leavingUser), 1);
+      socket.broadcast.emit("updateUsers", {
+        users
+      });
+    }
   });
 
   socket.on("disconnect", () => {
-    console.log(`socket ${socket.id} disconnected`);
     const leavingUser = users.find(user => user.id === socket.id);
-    // if (users.length > 0 && leavingUser.username) {
     if (leavingUser) {
-      // socket.broadcast.emit("updateStatus", {
-      //   message: `${leavingUser.username} has left the chat`
-      // });
-      // }
+      if (leavingUser.username !== undefined) {
+        socket.broadcast.emit("updateStatus", {
+          message: `${leavingUser.username} has left the chat`
+        });
+      }
       users.splice(users.indexOf(leavingUser), 1);
       socket.broadcast.emit("updateUsers", {
         users

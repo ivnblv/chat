@@ -13,11 +13,13 @@
   &__messages {
     overflow-x: hidden;
     padding-right: 0.5rem;
+    padding-bottom: 0.25rem;
   }
   &__message {
     padding: 0.8rem 1rem;
     font-size: 1.1rem;
     text-align: justify;
+    word-wrap: break-word;
     @include border-radius(0 15px 15px 0);
     &:nth-child(odd) {
       background-color: $color-secondary;

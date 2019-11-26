@@ -51,9 +51,10 @@ const PrivateChat = ({
         </button>
       </div>
       <Scrollbars
+        style={{ height: "100%" }}
         className="private-chat__scroll"
         renderThumbVertical={props => (
-          <div {...props} className="thumb-vertical" />
+          <div {...props} className="thumb-vertical thumb-vertical--small" />
         )}
       >
         <div id="private-messages" className="private-chat__messages">

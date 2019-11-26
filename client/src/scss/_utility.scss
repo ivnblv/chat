@@ -1,0 +1,164 @@
+.main {
+  display: grid;
+  grid-template-columns: 4fr 3fr 1fr;
+  grid-template-rows: 0.1fr 3fr 3fr;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  @media (max-width: $large) {
+    grid-template-columns: 4fr 3fr 1.5fr;
+  }
+  @media (max-width: $medium) {
+    grid-template-columns: 3fr 2fr;
+  }
+  @media (max-width: $small) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input-field {
+  width: 100%;
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+
+  &__message-input {
+    padding: 0.8rem 0.5rem;
+    width: 90%;
+    border: none;
+    border-top: 2px solid $color-secondary;
+    font-size: 1rem;
+    @media (max-width: $small) {
+      padding: 0.75rem;
+    }
+  }
+}
+
+.btn {
+  font-family: $font-title;
+  border: none;
+  background-color: $color-highlight;
+  color: $color-light;
+  @include transition(background-color, 0.5s);
+  &:hover {
+    background-color: darken($color-highlight, 15%);
+  }
+  &--large {
+    padding: 0.6rem 4rem;
+    font-size: 1.2rem;
+    @media (max-width: $small) {
+      padding: 0.5rem 3rem;
+      font-size: 1rem;
+    }
+  }
+  &--medium {
+    padding: 0.3rem 2rem;
+    font-size: 1.2rem;
+  }
+  &--small {
+    padding: 0.2rem 1.5rem;
+    font-size: 1.1rem;
+  }
+}
+.users-btn {
+  display: none;
+  position: relative;
+  height: 2rem;
+  margin-left: 2rem;
+  border: none;
+  background-color: $color-highlight;
+  &--highlighted {
+    &:before {
+      content: url('data:image/svg+xml;utf8,<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="envelope" class="icon-envelope" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="red" d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path></svg>');
+      position: absolute;
+      top: -2px;
+      right: -5px;
+      height: 15px;
+      width: 15px;
+      z-index: 2;
+      @include animation(opacityChange 1.3s linear alternate infinite);
+    }
+  }
+  @media (max-width: $medium) {
+    display: inline-block;
+  }
+  &__img {
+    width: auto;
+    height: 70%;
+    display: block;
+    color: $color-light;
+
+    @include transition(color, 0.5s);
+    &--highlighted {
+      @include animation(blinkingColor 1.6s linear alternate infinite);
+    }
+    &:hover {
+      color: lightgray;
+    }
+  }
+}
+.exit-btn {
+  width: 2rem;
+  margin-left: 2rem;
+  background-color: $color-highlight;
+  border: none;
+  height: 100%;
+
+  &__img {
+    color: $color-light;
+    height: 70%;
+    display: block;
+    @include transition(color, 0.3s);
+    &:hover {
+      color: $color-danger;
+    }
+  }
+}
+.close-btn {
+  width: 2rem;
+  background-color: $color-highlight;
+  height: 100%;
+  border: none;
+  padding: 0 0.5rem;
+  @media (max-width: $small) {
+    background-color: $color-secondary;
+  }
+  &__img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    color: $color-light;
+    @include transition(color, 0.3s);
+    &:hover {
+      color: $color-danger;
+    }
+    @media (max-width: $small) {
+      color: $color-danger;
+    }
+  }
+}
+
+.thumb-vertical {
+  background-color: darkgray;
+  @include border-radius(15px);
+  cursor: pointer;
+  &--small {
+    margin-top: 1rem;
+  }
+}
+@include keyframes(blinkingColor) {
+  from {
+    color: $color-secondary;
+  }
+  to {
+    color: lighten($color-highlight, 20%);
+  }
+}
+@include keyframes(opacityChange) {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}

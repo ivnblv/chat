@@ -11,8 +11,11 @@ const Chat = ({ message, type, messages, statusMessage, sendMessage }) => {
         )}
       >
         <div id="messages" className="chat__messages">
-          {messages.map(message => (
-            <div key={`messagge${message.username}`} className="chat__message">
+          {messages.map((message, i) => (
+            <div
+              key={`message${message.username + i}`}
+              className="chat__message"
+            >
               <span className="chat__username">{message.username}:</span>
               {message.message}
             </div>

@@ -14,10 +14,4 @@
     font-size: 1rem;
     margin-left: auto;
   }
-  &__online-users-btn {
-    display: none;
-    @media (max-width: $medium) {
-      display: block;
-    }
-  }
 }

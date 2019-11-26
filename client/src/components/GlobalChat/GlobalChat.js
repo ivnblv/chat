@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { navigate } from "hookrouter/dist/router";
-import socket from "../../socket";
 import ChatHeader from "../ChatHeader/ChatHeader";
 import OnlineUsers from "../OnlineUsers/OnlineUsers";
 import PrivateChat from "../PrivateChat/PrivateChat";
 import Chat from "../Chat/Chat";
+import io from "socket.io-client";
+const socket = io("localhost:5000");
 
 const GlobalChat = () => {
   const [username, setUsername] = useState("");
@@ -19,25 +20,63 @@ const GlobalChat = () => {
 
   useEffect(() => {
     const name = sessionStorage.getItem("username");
-    setUsername(name);
-    socket.emit("enterChat", { username: name });
+    if (name === null) {
+      navigate("/");
+    } else {
+      setUsername(name);
+      socket.emit("enterChat", { username: name });
+    }
+    return () => {
+      socket.emit("leaveChat", {
+        username
+      });
+      sessionStorage.removeItem("username");
+    };
   }, []);
-
   useEffect(() => {
-    const timer = setTimeout(() => {
-      updateStatusMessage("");
-    }, 2000);
+    socket.on("updateChat", updateChat);
+    socket.on("updateStatus", updateStatus);
+    socket.on("updateUsers", updateUsers);
+    socket.on("receivePrivateMessage", receivePrivate);
+    return () => {
+      socket.off("updateChat", updateChat);
+      socket.off("updateStatus", updateStatus);
+      socket.off("updateUsers", updateUsers);
+      socket.off("receivePrivateMessage", receivePrivate);
+    };
+  }, [
+    messages,
+    statusMessage,
+    onlineUsers,
+    privateHistory,
+    currentPrivateChat
+  ]);
+  useEffect(() => {
+    let timer;
+    if (statusMessage !== "") {
+      timer = setTimeout(() => {
+        updateStatusMessage("");
+      }, 2000);
+    }
     return () => {
       clearTimeout(timer);
     };
   }, [statusMessage]);
 
-  //chat update
+  useEffect(() => {
+    if (currentPrivateChat.id) {
+      setRead(currentPrivateChat.id);
+      setDisplayUsers(false);
+    }
+  }, [currentPrivateChat]);
+
   const updateChat = data => {
-    updateMessages([...messages, data]);
-    document
-      .getElementById("messages")
-      .lastChild.scrollIntoView(false, "smooth");
+    updateMessages(data);
+    if (messages.length > 0) {
+      document
+        .getElementById("messages")
+        .lastChild.scrollIntoView(false, "smooth");
+    }
   };
   //status message update
   const updateStatus = data => {
@@ -80,38 +119,8 @@ const GlobalChat = () => {
       updateUnreadMessages(newUnreadMessages);
     }
   };
-  useEffect(() => {
-    socket.on("updateChat", updateChat);
-    socket.on("updateStatus", updateStatus);
-    socket.on("updateUsers", updateUsers);
-    socket.on("receivePrivateMessage", receivePrivate);
-    return () => {
-      socket.off("updateChat", updateChat);
-      socket.off("updateStatus", updateStatus);
-      socket.off("updateUsers", updateUsers);
-      socket.off("receivePrivateMessage", receivePrivate);
-    };
-  }, [
-    messages,
-    statusMessage,
-    onlineUsers,
-    privateHistory,
-    currentPrivateChat
-  ]);
-
-  useEffect(() => {
-    if (currentPrivateChat.id) {
-      setRead(currentPrivateChat.id);
-      setDisplayUsers(false);
-    }
-  }, [currentPrivateChat]);
-
-  const exitChat = () => {
-    socket.emit("leaveChat", {
-      username
-    });
-    sessionStorage.removeItem("username");
-    navigate("/");
+  const isUnread = userId => {
+    return unreadMessages.includes(userId) ? true : false;
   };
   const sendMessage = e => {
     e.preventDefault();
@@ -141,8 +150,8 @@ const GlobalChat = () => {
     <div className="main">
       <ChatHeader
         username={username}
-        exitChat={exitChat}
         setUserListDisplay={setUserListDisplay}
+        unreadPresent={unreadMessages.length > 0 ? true : false}
       />
       <Chat
         username={username}
@@ -157,8 +166,9 @@ const GlobalChat = () => {
       <OnlineUsers
         users={onlineUsers}
         startPrivateChat={startPrivateChat}
-        unreadMessages={unreadMessages}
         displayUsers={displayUsers}
+        isUnread={isUnread}
+        privateHistory={privateHistory}
       />
       {currentPrivateChat.id ? (
         <PrivateChat
@@ -169,8 +179,6 @@ const GlobalChat = () => {
           history={privateHistory.find(
             history => history.id === currentPrivateChat.id
           )}
-          updatePrivateHistory={updatePrivateHistory}
-          setRead={setRead}
         />
       ) : null}
     </div>

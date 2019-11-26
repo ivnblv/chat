@@ -30,14 +30,16 @@
     display: flex;
     flex-direction: column;
     list-style-type: none;
+    padding-right: 0.5rem;
   }
   &__list-item {
     margin-top: 0.2rem;
+    border-bottom: 1px solid darken($color-secondary, 10%);
   }
   &__user {
     font-size: 1.1rem;
     padding: 0.4rem 0.8rem;
-    border-bottom: 1px solid darken($color-secondary, 10%);
+
     cursor: pointer;
     @include transition(background-color, 0.3s);
     &--highlighted {
@@ -49,7 +51,6 @@
     }
   }
 }
-
 @include keyframes(blinkingBg) {
   from {
     background-color: $color-secondary;

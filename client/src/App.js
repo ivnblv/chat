@@ -5,7 +5,7 @@ import GlobalChat from "./components/GlobalChat/GlobalChat";
 
 const routes = {
   "/": () => <Login />,
-  "/global": () => <GlobalChat />
+  "/chat": () => <GlobalChat />
 };
 
 const App = () => {
