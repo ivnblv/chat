@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Scrollbars } from "react-custom-scrollbars";
 
 const PrivateChat = ({
@@ -6,9 +6,12 @@ const PrivateChat = ({
   username,
   currentPrivateChat,
   closePrivateChat,
-  history
+  history,
+  autoScroll
 }) => {
   const [message, setMessage] = useState("");
+  const scrollBar = useRef(null);
+
   const sendMessage = e => {
     e.preventDefault();
     if (message.length > 0) {
@@ -22,11 +25,14 @@ const PrivateChat = ({
   };
 
   useEffect(() => {
-    const messages = document.getElementById("private-messages");
-    if (messages && messages.lastChild) {
-      messages.lastChild.scrollIntoView();
+    if (history.messages.length > 0) {
+      autoScroll(
+        scrollBar,
+        ".private-chat__messages",
+        ".private-chat__message"
+      );
     }
-  });
+  }, [history.messages.length]);
 
   return (
     <div className="private-chat">
@@ -51,13 +57,15 @@ const PrivateChat = ({
         </button>
       </div>
       <Scrollbars
+        ref={scrollBar}
+        renderView={props => <div {...props} className="scrollbar-view" />}
         style={{ height: "100%" }}
         className="private-chat__scroll"
         renderThumbVertical={props => (
           <div {...props} className="thumb-vertical thumb-vertical--small" />
         )}
       >
-        <div id="private-messages" className="private-chat__messages">
+        <div className="private-chat__messages">
           {history
             ? history.messages.map((message, i) => (
                 <div

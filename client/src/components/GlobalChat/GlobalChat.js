@@ -4,8 +4,7 @@ import ChatHeader from "../ChatHeader/ChatHeader";
 import OnlineUsers from "../OnlineUsers/OnlineUsers";
 import PrivateChat from "../PrivateChat/PrivateChat";
 import Chat from "../Chat/Chat";
-import io from "socket.io-client";
-const socket = io("localhost:5000");
+import socket from "../../socket";
 
 const GlobalChat = () => {
   const [username, setUsername] = useState("");
@@ -72,11 +71,6 @@ const GlobalChat = () => {
 
   const updateChat = data => {
     updateMessages(data);
-    if (messages.length > 0) {
-      document
-        .getElementById("messages")
-        .lastChild.scrollIntoView(false, "smooth");
-    }
   };
   //status message update
   const updateStatus = data => {
@@ -145,6 +139,21 @@ const GlobalChat = () => {
   const setUserListDisplay = () => {
     setDisplayUsers(!displayUsers);
   };
+  // autoscroll + autoscroll prevention if user scrolled up
+  const autoScroll = (scrollbar, messages, message) => {
+    const scrollTop = scrollbar.current.getValues().scrollTop;
+    const clientHeight = scrollbar.current.getValues().clientHeight;
+    const messagesHeight = document
+      .querySelector(messages)
+      .getBoundingClientRect().height;
+    const messageHeight = document
+      .querySelector(message)
+      .getBoundingClientRect().height;
+
+    if (messagesHeight - scrollTop - clientHeight < messageHeight + 1) {
+      scrollbar.current.scrollToBottom();
+    }
+  };
 
   return (
     <div className="main">
@@ -162,6 +171,7 @@ const GlobalChat = () => {
         sendMessage={sendMessage}
         onlineUsers={onlineUsers}
         startPrivateChat={startPrivateChat}
+        autoScroll={autoScroll}
       />
       <OnlineUsers
         users={onlineUsers}
@@ -176,9 +186,12 @@ const GlobalChat = () => {
           username={username}
           currentPrivateChat={currentPrivateChat}
           closePrivateChat={closePrivateChat}
-          history={privateHistory.find(
-            history => history.id === currentPrivateChat.id
-          )}
+          autoScroll={autoScroll}
+          history={
+            privateHistory.find(
+              history => history.id === currentPrivateChat.id
+            ) || { messages: [] }
+          }
         />
       ) : null}
     </div>

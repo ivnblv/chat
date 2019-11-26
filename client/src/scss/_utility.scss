@@ -137,14 +137,13 @@
     }
   }
 }
-
+.scrollbar-view {
+  margin-bottom: 0 !important;
+}
 .thumb-vertical {
   background-color: darkgray;
   @include border-radius(15px);
   cursor: pointer;
-  &--small {
-    margin-top: 1rem;
-  }
 }
 @include keyframes(blinkingColor) {
   from {

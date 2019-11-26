@@ -1,16 +1,33 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import StatusBar from "../StatusBar/StatusBar";
 import { Scrollbars } from "react-custom-scrollbars";
 
-const Chat = ({ message, type, messages, statusMessage, sendMessage }) => {
+const Chat = ({
+  message,
+  type,
+  messages,
+  statusMessage,
+  sendMessage,
+  autoScroll
+}) => {
+  const scrollBar = useRef(null);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      autoScroll(scrollBar, ".chat__messages", ".chat__message");
+    }
+  }, [messages]);
+
   return (
     <div className="chat">
       <Scrollbars
+        ref={scrollBar}
+        renderView={props => <div {...props} id="fortest" />}
         renderThumbVertical={props => (
           <div {...props} className="thumb-vertical" />
         )}
       >
-        <div id="messages" className="chat__messages">
+        <div className="chat__messages">
           {messages.map((message, i) => (
             <div
               key={`message${message.username + i}`}
