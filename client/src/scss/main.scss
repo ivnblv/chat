@@ -4,7 +4,10 @@
 @import "./utility";
 @import "../components/Login/login";
 @import "../components/Chat/chat";
+@import "../components/Chat/ChatMessage/chatMessage";
+@import "../components/InputField/inputField";
 @import "../components/OnlineUsers/onlineUsers";
 @import "../components/StatusBar/statusBar";
 @import "../components/PrivateChat/privateChat";
+@import "../components/PrivateChat/PrivateChatMessage/privateChatMessage";
 @import "../components/ChatHeader/chatHeader";

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import InputField from "../InputField/InputField";
+import PrivateChatMessage from "./PrivateChatMessage/PrivateChatMessage";
 import { Scrollbars } from "react-custom-scrollbars";
 
 const PrivateChat = ({
@@ -14,37 +16,34 @@ const PrivateChat = ({
   const scrollBar = useRef(null);
 
   useEffect(() => {
-    scrollBar.current.scrollToBottom();
-  }, []);
-  useEffect(() => {
     if (history.messages.length > 0) {
-      autoScroll(
-        scrollBar,
-        ".private-chat__messages",
-        ".private-chat__message"
-      );
+      autoScroll(scrollBar, ".private-chat__messages", ".private-message");
     }
   }, [history.messages.length]);
   useEffect(() => {
-    socket.on("privateMessageError", privateMessageError);
+    scrollBar.current.scrollToBottom();
+  }, [history.id]);
+
+  useEffect(() => {
+    socket.on("privateMessageError", ({ errorMessage }) =>
+      setError(errorMessage)
+    );
     let timer;
     if (error !== "") {
       timer = setTimeout(() => {
         setError("");
       }, 2000);
     }
-
     return () => {
-      socket.off("privateMessageError", privateMessageError);
+      socket.removeAllListeners("privateMessageError");
       clearTimeout(timer);
     };
-  }, [currentPrivateChat, error]);
+  }, [error]);
 
   const sendMessage = e => {
     e.preventDefault();
     if (message.length > 0) {
       socket.emit("sendPrivateMessage", {
-        // username intead of id in case of reconnect
         receivingUser: currentPrivateChat.username,
         username,
         message
@@ -52,10 +51,6 @@ const PrivateChat = ({
       setMessage("");
       scrollBar.current.scrollToBottom();
     }
-  };
-
-  const privateMessageError = ({ errorMessage }) => {
-    setError(errorMessage);
   };
 
   return (
@@ -92,49 +87,21 @@ const PrivateChat = ({
         <div className="private-chat__messages">
           {history
             ? history.messages.map((message, i) => (
-                <div
-                  key={`message${i}`}
-                  className={`private-chat__message ${
-                    message.username === username
-                      ? "private-chat__message--right"
-                      : "private-chat__message--left"
-                  }`}
-                >
-                  <p
-                    className={`private-chat__message-text ${
-                      message.username === username
-                        ? "private-chat__message-text--right"
-                        : "private-chat__message-text--left"
-                    }`}
-                  >
-                    {message.message}
-                  </p>
-                  <p
-                    className={`private-chat__username ${
-                      message.username === username
-                        ? "private-chat__username--right"
-                        : "private-chat__username--left"
-                    }`}
-                  >
-                    {message.username}
-                  </p>
-                </div>
+                <PrivateChatMessage
+                  key={`privateMessage${i}`}
+                  username={username}
+                  message={message}
+                />
               ))
             : null}
         </div>
       </Scrollbars>
       {error ? <div className="private-chat__error">{error}</div> : null}
-      <form className="input-field">
-        <input
-          className="input-field__message-input"
-          placeholder="Enter a message..."
-          value={message}
-          onChange={e => setMessage(e.target.value)}
-        />
-        <button className="btn btn--small" onClick={sendMessage}>
-          Send
-        </button>
-      </form>
+      <InputField
+        message={message}
+        setMessage={e => setMessage(e.target.value)}
+        send={sendMessage}
+      />
     </div>
   );
 };

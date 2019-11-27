@@ -15,26 +15,8 @@
     grid-template-columns: 1fr;
   }
 }
-.input-field {
-  width: 100%;
-  margin-top: auto;
-  display: flex;
-  justify-content: space-between;
-
-  &__message-input {
-    padding: 0.8rem 0.5rem;
-    width: 90%;
-    border: none;
-    border-top: 2px solid $color-secondary;
-    font-size: 1rem;
-    @media (max-width: $small) {
-      padding: 0.75rem;
-    }
-  }
-}
 .btn {
   font-family: $font-title;
-  // font-weight: bold;
   border: none;
   background-color: $color-highlight;
   color: $color-light;
@@ -53,7 +35,6 @@
   &--medium {
     padding: 0.3rem 1.5rem;
     font-size: 1.3rem;
-    // font-weight: 700;
   }
   &--small {
     padding: 0.3rem 1.2rem;
@@ -138,6 +119,7 @@
 }
 .scrollbar-view {
   margin-bottom: 0 !important;
+  overflow-x: hidden !important;
 }
 .thumb-vertical {
   background-color: darkgray;

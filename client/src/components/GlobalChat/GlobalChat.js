@@ -8,9 +8,6 @@ import socket from "../../socket";
 
 const GlobalChat = () => {
   const [username, setUsername] = useState("");
-  const [message, setMessage] = useState("");
-  const [messages, updateMessages] = useState([]);
-  const [statusMessage, updateStatusMessage] = useState([]);
   const [onlineUsers, updateOnlineUsers] = useState([]);
   const [displayUsers, setDisplayUsers] = useState(false);
   const [currentPrivateChat, setCurrentPrivateChat] = useState({});
@@ -33,34 +30,13 @@ const GlobalChat = () => {
     };
   }, []);
   useEffect(() => {
-    socket.on("updateChat", updateChat);
-    socket.on("updateStatus", updateStatus);
     socket.on("updateUsers", updateUsers);
     socket.on("receivePrivateMessage", receivePrivate);
     return () => {
-      socket.off("updateChat", updateChat);
-      socket.off("updateStatus", updateStatus);
-      socket.off("updateUsers", updateUsers);
-      socket.off("receivePrivateMessage", receivePrivate);
+      socket.removeAllListeners("updateUsers");
+      socket.removeAllListeners("receivePrivateMessage");
     };
-  }, [
-    messages,
-    statusMessage,
-    onlineUsers,
-    privateHistory,
-    currentPrivateChat
-  ]);
-  useEffect(() => {
-    let timer;
-    if (statusMessage !== "") {
-      timer = setTimeout(() => {
-        updateStatusMessage("");
-      }, 2000);
-    }
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [statusMessage]);
+  }, [onlineUsers, privateHistory, currentPrivateChat]);
 
   useEffect(() => {
     if (currentPrivateChat.id) {
@@ -69,16 +45,22 @@ const GlobalChat = () => {
     }
   }, [currentPrivateChat]);
 
-  const updateChat = data => {
-    updateMessages(data);
-  };
-  //status message update
-  const updateStatus = data => {
-    updateStatusMessage(data.message);
-  };
   //users update
-  const updateUsers = data => {
-    updateOnlineUsers(data.users.filter(user => user.id !== socket.id));
+  const updateUsers = ({ users }) => {
+    updateOnlineUsers(users.filter(user => user.id !== socket.id));
+    const lastUser = [...users].pop();
+    // in case there's an open private chat with reconnecting user
+    if (lastUser.username === currentPrivateChat.username) {
+      setCurrentPrivateChat(lastUser);
+      const index = privateHistory.findIndex(
+        user => user.id === currentPrivateChat.id
+      );
+      if (index !== -1) {
+        const newHistory = [...privateHistory];
+        newHistory[index].id = lastUser.id;
+        updatePrivateHistory(newHistory);
+      }
+    }
   };
   //receiving private messages
   const receivePrivate = ({ id, username, messages, updateUnread }) => {
@@ -116,14 +98,6 @@ const GlobalChat = () => {
   const isUnread = userId => {
     return unreadMessages.includes(userId) ? true : false;
   };
-  const sendMessage = (e, scrollbar) => {
-    e.preventDefault();
-    if (message.length > 0) {
-      socket.emit("message", { username, message });
-      scrollbar.current.scrollToBottom();
-      setMessage("");
-    }
-  };
   // private messaging
   const startPrivateChat = (e, user) => {
     e.preventDefault();
@@ -132,10 +106,6 @@ const GlobalChat = () => {
   const closePrivateChat = e => {
     e.preventDefault();
     setCurrentPrivateChat({});
-  };
-  const type = e => {
-    setMessage(e.target.value);
-    socket.emit("typing", { username });
   };
   const setUserListDisplay = () => {
     setDisplayUsers(!displayUsers);
@@ -150,7 +120,6 @@ const GlobalChat = () => {
     const messageHeight = document
       .querySelector(message)
       .getBoundingClientRect().height;
-
     if (messagesHeight - scrollTop - clientHeight < messageHeight + 1) {
       scrollbar.current.scrollToBottom();
     }
@@ -165,11 +134,7 @@ const GlobalChat = () => {
       />
       <Chat
         username={username}
-        message={message}
-        messages={messages}
-        statusMessage={statusMessage}
-        type={type}
-        sendMessage={sendMessage}
+        socket={socket}
         onlineUsers={onlineUsers}
         startPrivateChat={startPrivateChat}
         autoScroll={autoScroll}
@@ -186,6 +151,8 @@ const GlobalChat = () => {
           socket={socket}
           username={username}
           currentPrivateChat={currentPrivateChat}
+          setCurrentPrivateChat={setCurrentPrivateChat}
+          onlineUsers={onlineUsers}
           closePrivateChat={closePrivateChat}
           autoScroll={autoScroll}
           history={

@@ -38,18 +38,6 @@
   &__title {
     font-weight: bold;
   }
-  &__username {
-    display: block;
-    margin-right: 0.5rem;
-    padding-top: 0.2rem;
-    font-size: 1rem;
-    &--right {
-      text-align: right;
-    }
-    &--left {
-      text-align: left;
-    }
-  }
   &__scroll {
     & > div:first-of-type {
       overflow-x: hidden !important;
@@ -59,40 +47,6 @@
     padding-right: 1.5rem;
     @media (max-width: $large) {
       padding-right: 1.5rem;
-    }
-  }
-  &__message {
-    padding: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    &--left {
-      margin-right: auto;
-    }
-    &--right {
-      align-self: end;
-      margin-left: auto;
-    }
-  }
-  &__message-text {
-    display: inline-block;
-    padding: 0.5rem 1.5rem;
-    max-width: 60%;
-    background-color: $color-secondary;
-    word-wrap: break-word;
-    @media (max-width: $large) {
-      max-width: 75%;
-    }
-    @media (max-width: $small) {
-      max-width: 90%;
-    }
-    &--left {
-      @include border-radius(0 15px 15px 25px);
-      margin-right: auto;
-    }
-    &--right {
-      @include border-radius(15px 25px 0 15px);
-      margin-left: auto;
-      background-color: darken($color-secondary, 10%);
     }
   }
 }

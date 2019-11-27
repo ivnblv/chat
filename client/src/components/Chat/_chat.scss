@@ -14,23 +14,4 @@
     padding-right: 1rem;
     padding-bottom: 0.25rem;
   }
-  &__message {
-    padding: 0.7rem 1rem;
-    font-size: 1.15rem;
-    text-align: justify;
-    word-wrap: break-word;
-    @include border-radius(0 15px 15px 0);
-    @media (max-width: $small) {
-      padding-left: 0.25rem;
-      margin-right: 1rem;
-    }
-    &:nth-child(odd) {
-      background-color: $color-secondary;
-    }
-  }
-  &__username {
-    font-weight: bold;
-    margin-right: 0.3rem;
-    font-size: 1.15rem;
-  }
 }
