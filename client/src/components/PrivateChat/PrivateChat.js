@@ -10,6 +10,7 @@ const PrivateChat = ({
   autoScroll
 }) => {
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const scrollBar = useRef(null);
 
   useEffect(() => {
@@ -24,18 +25,37 @@ const PrivateChat = ({
       );
     }
   }, [history.messages.length]);
+  useEffect(() => {
+    socket.on("privateMessageError", privateMessageError);
+    let timer;
+    if (error !== "") {
+      timer = setTimeout(() => {
+        setError("");
+      }, 2000);
+    }
+
+    return () => {
+      socket.off("privateMessageError", privateMessageError);
+      clearTimeout(timer);
+    };
+  }, [currentPrivateChat, error]);
 
   const sendMessage = e => {
     e.preventDefault();
     if (message.length > 0) {
       socket.emit("sendPrivateMessage", {
-        to: currentPrivateChat.id,
-        username: username,
+        // username intead of id in case of reconnect
+        receivingUser: currentPrivateChat.username,
+        username,
         message
       });
       setMessage("");
       scrollBar.current.scrollToBottom();
     }
+  };
+
+  const privateMessageError = ({ errorMessage }) => {
+    setError(errorMessage);
   };
 
   return (
@@ -103,10 +123,11 @@ const PrivateChat = ({
             : null}
         </div>
       </Scrollbars>
+      {error ? <div className="private-chat__error">{error}</div> : null}
       <form className="input-field">
         <input
           className="input-field__message-input"
-          placeholder="Enter a message"
+          placeholder="Enter a message..."
           value={message}
           onChange={e => setMessage(e.target.value)}
         />

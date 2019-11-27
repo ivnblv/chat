@@ -53,19 +53,26 @@ io.on("connection", socket => {
     io.emit("updateChat", messages);
   });
 
-  socket.on("sendPrivateMessage", ({ to, message, username }) => {
-    io.to(`${to}`).emit("receivePrivateMessage", {
-      messages: [{ username, message }],
-      id: socket.id,
-      username,
-      updateUnread: true
-    });
-    io.to(`${socket.id}`).emit("receivePrivateMessage", {
-      messages: [{ username, message }],
-      id: to,
-      username,
-      updateUnread: false
-    });
+  socket.on("sendPrivateMessage", ({ receivingUser, message, username }) => {
+    const receiver = users.find(user => user.username === receivingUser);
+    if (receiver) {
+      io.to(`${receiver.id}`).emit("receivePrivateMessage", {
+        messages: [{ username, message }],
+        id: socket.id,
+        username,
+        updateUnread: true
+      });
+      io.to(`${socket.id}`).emit("receivePrivateMessage", {
+        messages: [{ username, message }],
+        id: receiver.id,
+        username,
+        updateUnread: false
+      });
+    } else {
+      io.to(`${socket.id}`).emit("privateMessageError", {
+        errorMessage: `${receivingUser} is offline`
+      });
+    }
   });
 
   socket.on("leaveChat", () => {

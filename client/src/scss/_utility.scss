@@ -34,6 +34,7 @@
 }
 .btn {
   font-family: $font-title;
+  // font-weight: bold;
   border: none;
   background-color: $color-highlight;
   color: $color-light;
@@ -43,19 +44,20 @@
   }
   &--large {
     padding: 0.6rem 4rem;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     @media (max-width: $small) {
       padding: 0.5rem 3rem;
       font-size: 1rem;
     }
   }
   &--medium {
-    padding: 0.3rem 2rem;
-    font-size: 1.2rem;
+    padding: 0.3rem 1.5rem;
+    font-size: 1.3rem;
+    // font-weight: 700;
   }
   &--small {
-    padding: 0.2rem 1.5rem;
-    font-size: 1.1rem;
+    padding: 0.3rem 1.2rem;
+    font-size: 1.3rem;
   }
 }
 .users-btn {
