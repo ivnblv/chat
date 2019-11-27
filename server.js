@@ -1,29 +1,37 @@
 const express = require("express");
 const socket = require("socket.io");
 const path = require("path");
+const cors = require("cors");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// app.use(express.static("client/dist"));
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
-// });
+app.use(cors());
+app.use(express.static("client/dist"));
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
+});
 
-const server = app.listen(PORT, () =>
-  console.log(`Server running on port ${PORT}`)
-);
+const server = app.listen(PORT);
 const io = socket(server);
 
 const users = [];
 const messages = [];
 
 io.on("connection", socket => {
+  socket.on("loginAttempt", username => {
+    if (users.findIndex(user => user.username === username) !== -1) {
+      io.to(`${socket.id}`).emit(
+        "loginFailure",
+        `Username ${username} is currently taken`
+      );
+    } else io.to(`${socket.id}`).emit("loginSuccess", username);
+  });
   socket.on("enterChat", ({ username }) => {
     const user = { username, id: socket.id };
     users.push(user);
     socket.broadcast.emit("updateStatus", {
-      message: `${username} has joined the chat`
+      message: `${username} joined the chat`
     });
     io.emit("updateUsers", {
       users
@@ -65,7 +73,7 @@ io.on("connection", socket => {
     if (leavingUser !== undefined) {
       if (leavingUser.username !== undefined) {
         socket.broadcast.emit("updateStatus", {
-          message: `${leavingUser.username} has left the chat`
+          message: `${leavingUser.username} left the chat`
         });
       }
       users.splice(users.indexOf(leavingUser), 1);
@@ -80,7 +88,7 @@ io.on("connection", socket => {
     if (leavingUser) {
       if (leavingUser.username !== undefined) {
         socket.broadcast.emit("updateStatus", {
-          message: `${leavingUser.username} has left the chat`
+          message: `${leavingUser.username} left the chat`
         });
       }
       users.splice(users.indexOf(leavingUser), 1);

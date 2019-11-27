@@ -3,7 +3,6 @@
   grid-column: 3/4;
   grid-row: 2/4;
   background-color: $color-secondary;
-
   height: 100%;
   z-index: 3;
   &--hidden {
@@ -25,7 +24,6 @@
     -webkit-box-shadow: -9px -2px 5px 0px rgba(0, 0, 0, 0.28);
     -moz-box-shadow: -9px -2px 5px 0px rgba(0, 0, 0, 0.28);
   }
-
   &__list {
     display: flex;
     flex-direction: column;

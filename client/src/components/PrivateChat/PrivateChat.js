@@ -12,18 +12,9 @@ const PrivateChat = ({
   const [message, setMessage] = useState("");
   const scrollBar = useRef(null);
 
-  const sendMessage = e => {
-    e.preventDefault();
-    if (message.length > 0) {
-      socket.emit("sendPrivateMessage", {
-        to: currentPrivateChat.id,
-        username: username,
-        message
-      });
-      setMessage("");
-    }
-  };
-
+  useEffect(() => {
+    scrollBar.current.scrollToBottom();
+  }, []);
   useEffect(() => {
     if (history.messages.length > 0) {
       autoScroll(
@@ -33,6 +24,19 @@ const PrivateChat = ({
       );
     }
   }, [history.messages.length]);
+
+  const sendMessage = e => {
+    e.preventDefault();
+    if (message.length > 0) {
+      socket.emit("sendPrivateMessage", {
+        to: currentPrivateChat.id,
+        username: username,
+        message
+      });
+      setMessage("");
+      scrollBar.current.scrollToBottom();
+    }
+  };
 
   return (
     <div className="private-chat">

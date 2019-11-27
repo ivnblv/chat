@@ -116,10 +116,11 @@ const GlobalChat = () => {
   const isUnread = userId => {
     return unreadMessages.includes(userId) ? true : false;
   };
-  const sendMessage = e => {
+  const sendMessage = (e, scrollbar) => {
     e.preventDefault();
     if (message.length > 0) {
       socket.emit("message", { username, message });
+      scrollbar.current.scrollToBottom();
       setMessage("");
     }
   };

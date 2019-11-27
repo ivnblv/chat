@@ -15,7 +15,6 @@
     grid-template-columns: 1fr;
   }
 }
-
 .input-field {
   width: 100%;
   margin-top: auto;
@@ -33,7 +32,6 @@
     }
   }
 }
-
 .btn {
   font-family: $font-title;
   border: none;
@@ -103,7 +101,6 @@
   background-color: $color-highlight;
   border: none;
   height: 100%;
-
   &__img {
     color: $color-light;
     height: 70%;

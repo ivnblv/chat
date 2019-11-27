@@ -22,7 +22,6 @@ const Chat = ({
     <div className="chat">
       <Scrollbars
         ref={scrollBar}
-        renderView={props => <div {...props} id="fortest" />}
         renderThumbVertical={props => (
           <div {...props} className="thumb-vertical" />
         )}
@@ -48,7 +47,10 @@ const Chat = ({
           value={message}
           onChange={e => type(e)}
         />
-        <button className="btn btn--medium" onClick={sendMessage}>
+        <button
+          className="btn btn--medium"
+          onClick={e => sendMessage(e, scrollBar)}
+        >
           Send
         </button>
       </form>
